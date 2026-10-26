@@ -22,7 +22,7 @@
     .brand-mark{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--navy);color:#fff;font-size:14px}
     .brand small{font-size:10px;color:#7a8e97;letter-spacing:.15em;font-weight:700;margin-left:4px}
     .topmeta{display:flex;align-items:center;gap:15px;color:var(--muted);font-size:12px}
-    .private-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid #d2e6e2;background:#f3fbf9;border-radius:99px;color:#286968;font-weight:700}
+    .public-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid #d2e6e2;background:#f3fbf9;border-radius:99px;color:#286968;font-weight:700}
     .private-dot{width:7px;height:7px;border-radius:50%;background:#368c78}
     main{padding-top:30px}
     .hero{display:grid;grid-template-columns:1.35fr .65fr;gap:24px;align-items:stretch;margin:12px 0 24px}
@@ -51,6 +51,8 @@
     .toggle-switch input:checked+.toggle-slider:before{transform:translateX(20px)}
     .toggle-switch input:focus-visible+.toggle-slider{outline:3px solid rgba(8,127,128,.25);outline-offset:2px}
     .basis-detail{flex:1;min-width:260px;max-width:610px;color:#71828a;font-size:11px;line-height:1.65}
+    .basis-detail summary{cursor:pointer;color:#286d78;font-weight:700;white-space:nowrap}
+    .basis-detail div{margin-top:8px;max-width:780px}
     .basis-detail a{color:#286d78;text-decoration:none}
     .basis-detail a:hover{text-decoration:underline}
     .field{display:flex;flex-direction:column;gap:6px;min-width:170px}
@@ -157,7 +159,7 @@
     </a>
     <div class="topmeta">
       <span class="asof">資料更新 <strong>2026.10.26</strong></span>
-      <span class="private-badge"><span class="private-dot"></span>私人分析介面</span>
+      <span class="public-badge"><span class="private-dot"></span>公開網站</span>
     </div>
   </header>
   <main>
@@ -165,7 +167,7 @@
       <div class="hero-copy">
         <div class="eyebrow">PERSONAL LOAN · TAIWAN</div>
         <h1>台灣個人信貸<br><span>利率觀察</span></h1>
-        <p>把 29 份銀行分庫整理成可篩選的利率分布。可看絕對年利率，或扣除共同參考 I 值後比較利差；銀行與職業各自使用可用案例，不互相套篩選。</p>
+        <p>依網路分享的信貸案例整理，可比較整體、各銀行與不同職業的利率分布，也能切換原始利率和扣 I 後的利差。</p>
       </div>
       <aside class="hero-note">
         <div>
@@ -188,20 +190,23 @@
         </span>
       </label>
       <button class="reset" id="resetFilters" type="button">重設篩選</button>
-      <div class="basis-detail" id="basisDetail">使用原文可辨識的年利率；約數照錄、單一範圍取中點，有最終核准值時優先採用。</div>
+      <details class="basis-detail">
+        <summary>！計算方式與資料說明</summary>
+        <div id="basisDetail">載入中…</div>
+      </details>
     </section>
 
     <section class="stat-grid" aria-label="資料摘要">
       <div class="stat-card"><div class="label">資料庫案例</div><strong id="caseCount">—</strong><small>不受圖表篩選影響</small></div>
-      <div class="stat-card"><div class="label">目前口徑可用利率</div><strong id="rateCount">—</strong><small id="rateCoverage">所有符合口徑的案例</small></div>
-      <div class="stat-card"><div class="label" id="medianLabel">整體中位年利率</div><strong id="medianRate">—</strong><small>採全部可用利率案例</small></div>
-      <div class="stat-card"><div class="label">有年份與 I 值</div><strong id="yearCoverageCount">—</strong><small id="yearCoverage">有年度 I／全部可辨識利率</small></div>
+      <div class="stat-card"><div class="label">可比較的利率案例</div><strong id="rateCount">—</strong><small id="rateCoverage">所有符合口徑的案例</small></div>
+      <div class="stat-card"><div class="label" id="medianLabel">整體中位年利率</div><strong id="medianRate">—</strong><small id="medianHint">採全部可用利率案例</small></div>
+      <div class="stat-card"><div class="label">可扣 I 案例</div><strong id="yearCoverageCount">—</strong><small id="yearCoverage">有年度 I／全部可辨識利率</small></div>
       <div class="stat-card"><div class="label">職業可分類案例</div><strong id="roleCoverageCount">—</strong><small id="roleCoverage">未明職業另列</small></div>
     </section>
 
     <section class="section">
       <div class="section-head">
-        <div><div class="kicker">01 / RATE LANDSCAPE</div><h2>利率落點</h2><p>以目前比較口徑統計全部可用利率；長條越長，落在該區間的案例越多。</p></div>
+        <div><div class="kicker">01 / RATE LANDSCAPE</div><h2>利率落點</h2><p id="histDescription">目前口徑下的案例分布；長條越長，代表該區間案例越多。</p></div>
         <div class="hist-summary" id="histSummary"></div>
       </div>
       <div class="hist-card">
@@ -212,7 +217,7 @@
     <div class="two-col">
       <section class="chart-panel">
         <div class="panel-head">
-          <div><div class="kicker">02 / BANKS</div><h2>各銀行利率分布</h2><p>只按銀行分組，不套用職業條件；納入所有可辨識利率，不要求職業欄完整。</p></div>
+          <div><div class="kicker">02 / BANKS</div><h2>各銀行利率分布</h2><p id="bankDescription">每列一間銀行，獨立按銀行分類；納入所有有利率的案例。</p></div>
           <span class="sample-pill" id="bankCount">載入中</span>
         </div>
         <div class="panel-filters">
@@ -222,12 +227,12 @@
         </div>
         <div class="plot-legend"><span class="legend-item"><i class="legend-line"></i>P10–P90</span><span class="legend-item"><i class="legend-box"></i>第 1–3 四分位</span><span class="legend-item"><i class="legend-median"></i>中位數</span></div>
         <div class="chart-axis" id="bankAxis"></div><div class="plot" id="bankChart"><div class="loading">正在整理銀行分布…</div></div>
-        <div class="chart-note">圖中線段為 P10–P90，盒狀區為第 1–3 四分位，中央線為中位數；刻度依目前銀行圖資料自動調整。每列列出樣本數；n&lt;10 代表案例較少。</div>
+        <div class="chart-note">橫線呈現案例利率分布，中間標記是中位數；每列列出案例數，少於 10 筆時樣本較少。</div>
       </section>
 
       <section class="chart-panel">
         <div class="panel-head">
-          <div><div class="kicker">03 / OCCUPATIONS</div><h2>職業利率分布</h2><p>只按職業分組，不套用銀行條件；依原文與工作背景線索寬鬆分類，仍不清楚時列未提供／未明。</p></div>
+          <div><div class="kicker">03 / OCCUPATIONS</div><h2>職業利率分布</h2><p>每列一種職業，獨立按職業分類；不要求銀行欄也完整。</p></div>
           <span class="sample-pill" id="roleCount">載入中</span>
         </div>
         <div class="panel-filters">
@@ -238,29 +243,27 @@
         <label class="checkline"><input type="checkbox" id="includeUnknownRole" checked>包含未提供／未明職業（另列）</label>
         <div class="plot-legend"><span class="legend-item"><i class="legend-line"></i>P10–P90</span><span class="legend-item"><i class="legend-box"></i>第 1–3 四分位</span><span class="legend-item"><i class="legend-median"></i>中位數</span></div>
         <div class="chart-axis" id="roleAxis"></div><div class="plot" id="roleChart"><div class="loading">正在整理職業分布…</div></div>
-        <div class="chart-note" id="roleNote">職業依原文欄位與工作背景線索分類；線索不足仍列未提供／未明。n&lt;10 代表案例較少。</div>
+        <div class="chart-note" id="roleNote">職業依原文與工作背景線索分類；不清楚時另列未提供／未明。</div>
       </section>
     </div>
 
     <section class="pair-card section">
       <div class="section-head">
-        <div><div class="kicker">04 / RATE CHANGE</div><h2>案例記載的前後利率</h2><p>只計入原文以箭頭記錄、且前後兩個數字皆為明確年利率的案例。</p></div>
+        <div><div class="kicker">04 / RATE CHANGE</div><h2>送審與議價前後的利率變化</h2><p>比較案例中較早提到的利率與後續利率中位數；實際階段依原文描述。</p></div>
       </div>
       <div class="pair-layout">
-        <div class="pair-stat"><div class="label">箭頭前中位數</div><strong id="pairBefore">—</strong><small>原文箭頭左側數值</small></div>
-        <div class="pair-stat"><div class="label">箭頭後中位數</div><strong id="pairAfter">—</strong><small>原文箭頭右側數值</small></div>
-        <div class="pair-stat"><div class="label">中位變化</div><strong id="pairDelta">—</strong><small id="pairDeltaCaption">僅配對案例</small></div>
+        <div class="pair-stat"><div class="label" id="pairBeforeLabel">送審／初估中位利率</div><strong id="pairBefore">—</strong><small>案例較早記載的利率</small></div>
+        <div class="pair-stat"><div class="label" id="pairAfterLabel">議價／後續中位利率</div><strong id="pairAfter">—</strong><small>案例後來更新的利率</small></div>
+        <div class="pair-stat"><div class="label">中位利率變化</div><strong id="pairDelta">—</strong><small id="pairDeltaCaption">僅配對案例</small></div>
       </div>
-      <div class="pair-compare"><span>配對案例數</span><span class="compare-value" id="pairN">—</span><span class="compare-arrow">→</span><span>此比較僅反映案例文字中的前後數值，未必都是正式核准利率。</span></div>
+      <div class="pair-compare"><span>比較案例數</span><span class="compare-value" id="pairN">—</span><span class="compare-arrow">→</span><span>依案例文字前後整理；每篇不一定都明確描述正式送審與議價。</span></div>
     </section>
 
-    <section class="disclaimer">
-      <strong>使用限制：</strong>資料來自個人公開貼文與留言的自述，非銀行官方核貸資料。利率優先採原文的名目利率；約數照錄、單一區間取中點，有最終核准值時優先採用，APR 不代替名目利率。扣除 I 值時，沒有明確貸款年份便採來源貼文年；兩者相差超過 2 年才保留原文貸款年，Dcard 部分年份依貼文編號估算。只在有對應歷史值時納入扣 I。銀行合約指標可能不同，因此扣 I 結果是比較用利差，不等同每筆合約加碼。銀行圖與職業圖分開使用各自可用案例；職業依原文與工作背景線索分類，仍不明者保留未提供／未明。
-    </section>
+    <section class="disclaimer"><strong>資料提醒：</strong>內容來自個人公開分享，利率和職業整理可能不完整；圖表只供案例比較，不代表銀行正式核貸條件或個人可取得的利率。</section>
   </main>
   <footer>
     <span>資料快照：2026-10-26 · 案例分級 A 403／B 1,107／C 324 · 僅供個人比較參考</span>
-    <span><a href="https://docs.google.com/document/d/1PXqz49k8Z9wfauG0LLJFny2BAQjyn_zhsXLXKFDFqGM/edit" target="_blank" rel="noopener noreferrer">開啟資料庫總索引 ↗</a> · <a href="https://web.taishinbank.com.tw/TSB/export/sites/TSB/files/loan/_20260921Adjustable-Rates-for-Consumer-Loans.pdf" target="_blank" rel="noopener noreferrer">I 值歷史參考表 ↗</a></span>
+    <span><a href="data.xlsx" download>下載案例資料 Excel（XLSX）</a> · <a href="https://docs.google.com/document/d/1PXqz49k8Z9wfauG0LLJFny2BAQjyn_zhsXLXKFDFqGM/edit" target="_blank" rel="noopener noreferrer">開啟資料庫總索引 ↗</a> · <a href="https://web.taishinbank.com.tw/TSB/export/sites/TSB/files/loan/_20260921Adjustable-Rates-for-Consumer-Loans.pdf" target="_blank" rel="noopener noreferrer">I 值歷史參考表 ↗</a></span>
   </footer>
 </div>
 <script>
@@ -278,6 +281,7 @@
   var fmt=new Intl.NumberFormat("zh-TW",{maximumFractionDigits:2});
   var unknownRole="未提供／未明";
   var pct=function(x){return Number.isFinite(x)?fmt.format(x)+"%":"—";};
+  var currentI=function(){var b=meta.iBenchmark||{};return Number.isFinite(b.currentValue)?b.currentValue:1.72;};
   var escapeHtml=function(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});};
   var median=function(v){if(!v.length)return null;var a=v.slice().sort(function(x,y){return x-y;});var m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2;};
   var quantile=function(v,p){if(!v.length)return null;var a=v.slice().sort(function(x,y){return x-y;});var pos=(a.length-1)*p;var lo=Math.floor(pos),hi=Math.ceil(pos);return a[lo]+(a[hi]-a[lo])*(pos-lo);};
@@ -363,6 +367,8 @@
     var pairs=records.filter(function(r){return beforeRate(r)!==null&&afterRate(r)!==null;});
     var before=pairs.map(beforeRate),after=pairs.map(afterRate),b=median(before),a=median(after);
     var delta=(a!==null&&b!==null)?a-b:null;
+    document.getElementById("pairBeforeLabel").textContent=modeEl.checked?"送審／初估中位利差":"送審／初估中位利率";
+    document.getElementById("pairAfterLabel").textContent=modeEl.checked?"議價／後續中位利差":"議價／後續中位利率";
     document.getElementById("pairN").textContent=fmt.format(pairs.length);
     document.getElementById("pairBefore").textContent=pct(b);
     document.getElementById("pairAfter").textContent=pct(a);
@@ -371,12 +377,13 @@
   }
   function updateBasisDetail(){
     var el=document.getElementById("basisDetail");
+    var b=meta.iBenchmark||{},now=currentI(),currentLabel=now===null?"目前 I 值未提供":"目前 I 值為 "+pct(now)+(b.currentValueAsOf?"（截至 "+b.currentValueAsOf+"）":"");
+    var link=b.historySource||"https://web.taishinbank.com.tw/TSB/export/sites/TSB/files/loan/_20260921Adjustable-Rates-for-Consumer-Loans.pdf";
     if(!modeEl.checked){
-      el.innerHTML="絕對利率視圖納入原文可辨識的年利率；約數照錄、單一區間取中點，有明確最終核准值時優先採用。銀行圖與職業圖分開使用各自可用案例，不要求兩種欄位都完整。";
+      el.innerHTML="利率依原文可辨識數字整理；約數照錄，只有區間時取中點。銀行分布和職業分布各自使用能分類的案例，不要求兩種資料同時齊全。<br><br>切到扣 I 後，會用案例對應年份的參考 I 值做比較。";
       return;
     }
-    var b=meta.iBenchmark||{},link=b.historySource||"https://web.taishinbank.com.tw/TSB/export/sites/TSB/files/loan/_20260921Adjustable-Rates-for-Consumer-Loans.pdf";
-    el.innerHTML="扣 I 利差＝名目利率－I。以郵政二年期定儲機動利率作共同參考，按年度日數加權。沒有明確貸款年份時採來源貼文年；貸款年與貼文年相差不超過 2 年時採貼文年，差距更大才保留原文貸款年。部分 Dcard 貼文年依貼文編號估算。例：同為 3.00%，2020 年扣年度加權 I 約 0.902% 後為 2.10%；2026 年扣 I 1.720% 後為 1.28%。原文明示 i＋加碼則直接採原文加碼。年份或歷史值不足者仍無法扣 I；銀行合約指標可能不同。<a href=\""+escapeHtml(link)+"\" target=\"_blank\" rel=\"noopener noreferrer\">查看 I 值歷史表 ↗</a>";
+    el.innerHTML="扣 I 利差＝案例利率－該年份 I 值。共同參考採郵政二年期定儲機動利率；"+currentLabel+"。歷史案例扣除各自年份或月份的 I 值，所以不同年份的數字可放在同一口徑下看。年份不足的案例不計入扣 I。貸款年份不明時以發文年估算；兩年內差距採發文年，差距更大才採原文貸款年。部分 Dcard 年份依貼文編號估算。銀行合約可能使用不同指標，因此扣 I 是比較參考，不代表合約加碼。<a href=\""+escapeHtml(link)+"\" target=\"_blank\" rel=\"noopener noreferrer\">查看 I 值歷史表 ↗</a>";
   }
   function updateStats(){
     var all=records.filter(function(r){return metricRate(r)!==null;});
@@ -388,7 +395,12 @@
     document.getElementById("yearCoverageCount").textContent=fmt.format(yearlyRateRows);
     document.getElementById("yearCoverage").textContent="有年度 I／全部可辨識利率："+fmt.format(yearlyRateRows)+" / "+fmt.format(records.filter(function(r){return r.nominalRate!==null;}).length);
     document.getElementById("medianRate").textContent=pct(median(rates));
-    document.getElementById("medianLabel").textContent=modeEl.checked?"整體中位扣 I 利差":"整體中位年利率";
+    var currentLabel=currentI()===null?"":"（目前 I "+pct(currentI())+"）";
+    document.getElementById("medianLabel").textContent=modeEl.checked?"整體中位扣 I 利差"+currentLabel:"整體中位年利率";
+    document.getElementById("medianHint").textContent=modeEl.checked?"案例各自扣除適用年份 I；目前值只供參考":"採全部可用利率案例";
+    document.getElementById("histDescription").textContent=modeEl.checked?"扣 I 後的利差分布"+currentLabel+"；長條越長，代表該區間案例越多。":"目前口徑下的案例分布；長條越長，代表該區間案例越多。";
+    document.getElementById("bankDescription").textContent=modeEl.checked?"每列一間銀行，按銀行分組的扣 I 利差"+currentLabel+"；納入所有有可用利差的案例。":"每列一間銀行，獨立按銀行分類；納入所有有利率的案例。";
+    document.getElementById("filterState").textContent=modeEl.checked?"扣除 I 值後的利差"+currentLabel:"絕對名目年利率";
     document.getElementById("roleCoverageCount").textContent=fmt.format(knownRole);
     document.getElementById("roleCoverage").textContent="包含原文與工作背景線索分類；未明仍另列";
     document.getElementById("filterState").textContent=modeEl.checked?"扣除 I 值後的利差":"絕對名目年利率";
