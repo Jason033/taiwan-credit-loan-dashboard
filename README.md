@@ -1,6 +1,7 @@
 # 台灣個人信貸利率觀察
 
-**公開網站：** <https://taiwan-credit-rate-explorer.hazy-skunk-5453.chatgpt.site>  
+**GitHub Pages 網址（啟用後）：** `https://jason033.github.io/taiwan-credit-loan-dashboard/`  
+**舊站（ChatGPT Sites）：** <https://taiwan-credit-rate-explorer.hazy-skunk-5453.chatgpt.site>（不會隨 GitHub 提交自動更新）  
 **資料快照：** 2026-10-26 · **完整案例：** 1,834 筆  
 **Excel：** [下載完整案例與摘要工作表](data.xlsx)
 
@@ -55,6 +56,19 @@ GitHub 儲存庫維持私有；互動網站可由任何取得網址的人開啟�
 - 使用外部 [Busuanzi 計數 API](https://bsz.saop.cc/en) 保存全站統計。第一次開啟呼叫 `POST /api`；同一瀏覽器記住已計數狀態，之後只用 `GET /api` 讀取最新累計值。
 - API 也會做伺服器端訪客去重；同一人換瀏覽器、裝置、網路或清除識別資料時，仍可能被視為不同訪客。因此數字是估計值，無法保證每個自然人終身只算一次。
 - 外部服務為辨識訪客會收到必要的連線資訊（例如 IP 位址與瀏覽器資訊），本站不自行儲存個人身分資料。服務無法連線時顯示「—」，不會捏造數字。
+
+## GitHub Pages 發布
+
+本站使用純 HTML / JavaScript，`index.html`、`data.json`、`data.xlsx` 已放在 `main` 分支根目錄，不必另建網站或執行建置指令。
+
+1. 前往此儲存庫的 **Settings → Pages**。
+2. **Build and deployment → Source** 選 **Deploy from a branch**。
+3. **Branch** 選 `main`，資料夾選 `/(root)`，然後按 **Save**。
+4. 部署成功後，網站網址為 <https://jason033.github.io/taiwan-credit-loan-dashboard/>，之後更新 `main` 會自動發布。
+
+**權限注意：** 此儲存庫目前為 **Private**。GitHub Free 無法直接從私有儲存庫發布 Pages；需要 GitHub Pro，或先建立只放網站公開檔案的公開儲存庫。請勿為了啟用 Pages 未經資料檢查就公開整個專案。Pages 即使使用私有儲存庫建置，網站內容仍對所有人公開。
+
+**訪客計數：** 網站頁尾的 UV 計數器由外部 API 保存數字；單靠 GitHub Pages 靜態託管不具備伺服器端持久計數功能。
 
 ## 本機開啟
 
