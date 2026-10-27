@@ -59,16 +59,18 @@ GitHub 儲存庫維持私有；互動網站可由任何取得網址的人開啟�
 
 ## GitHub Pages 發布
 
-本站使用純 HTML / JavaScript，`index.html`、`data.json`、`data.xlsx` 已放在 `main` 分支根目錄，不必另建網站或執行建置指令。
+此專案已設定 GitHub Actions 自動部署工作流程：[`deploy-pages.yml`](.github/workflows/deploy-pages.yml)。只有 `index.html`、`data.json`、`data.xlsx` 會打包成公開網站，更新 `main` 便自動重新部署。
 
-1. 前往此儲存庫的 **Settings → Pages**。
-2. **Build and deployment → Source** 選 **Deploy from a branch**。
-3. **Branch** 選 `main`，資料夾選 `/(root)`，然後按 **Save**。
-4. 部署成功後，網站網址為 <https://jason033.github.io/taiwan-credit-loan-dashboard/>，之後更新 `main` 會自動發布。
+**首次啟用設定（由儲存庫管理者執行一次）：**
 
-**權限注意：** 此儲存庫目前為 **Private**。GitHub Free 無法直接從私有儲存庫發布 Pages；需要 GitHub Pro，或先建立只放網站公開檔案的公開儲存庫。請勿為了啟用 Pages 未經資料檢查就公開整個專案。Pages 即使使用私有儲存庫建置，網站內容仍對所有人公開。
+1. 前往 **Settings → General → Danger Zone → Change repository visibility**。若帳號為 GitHub Free，選 **Public**（公開整個原始碼與資料檔）；若帳號支援私有儲存庫 Pages，則可保留 Private。
+2. 前往 **Settings → Pages → Build and deployment → Source**，選 **GitHub Actions**。
+3. 如自動部署工作流程先前因 Pages 未啟用而失敗，前往 **Actions → Deploy credit loan dashboard to GitHub Pages → Run workflow** 重新執行。
+4. 發布成功後，網址為 <https://jason033.github.io/taiwan-credit-loan-dashboard/>。
 
-**訪客計數：** 網站頁尾的 UV 計數器由外部 API 保存數字；單靠 GitHub Pages 靜態託管不具備伺服器端持久計數功能。
+**狀態：** 工作流程已提交，但尚未確認網站已啟用及部署完成。GitHub Pages 網站即使使用私人儲存庫，也可能對外公開。
+
+**訪客計數：** 網站頁尾顯示累計 UV 估計值，使用外部計數 API，並以瀏覽器儲存狀態避免一般重新整理重複送出計數。
 
 ## 本機開啟
 
